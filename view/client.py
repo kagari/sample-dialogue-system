@@ -1,7 +1,13 @@
+import sys
+print(sys.path.append('/app/'))
+from model.agent import Agent
+
 SYSTEM_PROMPT = 'S| '
 USER_PROMPT = 'U| '
 
 def main():
+    agent = Agent()  # 対話エージェントの初期化
+
     print('Starting Dialogue Agent...')
     print(SYSTEM_PROMPT+'Each time are finished talking, type RET twice.')
     while True:
@@ -10,8 +16,9 @@ def main():
         fw = s.split()[-1].replace('。', '').replace('、', '').replace('.', '').replace(',', '')
         if fw in {'またね', 'じゃあね', '終わり', 'おわり', 'finish', 'end', 'exit', 'see you'}:
             break
-        # おうむ返しBotをまずは実装した方が良さそう？
-        print(s)
+        # TODO: 今は入力をそのまま返すだけなので、要修正
+        r = agent.reply(s)
+        print(SYSTEM_PROMPT+r)
     print(SYSTEM_PROMPT+fw)
     print('Finished Dialogue Agent...')
 

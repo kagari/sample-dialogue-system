@@ -1,2 +1,3 @@
 .rsyncignore
 Makefile
+__pycache__
