@@ -1,3 +1,4 @@
+.DS_Store
 .rsyncignore
 Makefile
 __pycache__
