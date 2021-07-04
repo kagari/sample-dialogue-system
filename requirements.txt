@@ -1,0 +1,2 @@
+﻿mecab-python3==1.0.4
+unidic==1.0.3

@@ -1,3 +1,6 @@
+import os
+import MeCab
+
 class Agent():
     def __init__(self) -> None:
         pass
@@ -9,4 +12,10 @@ class Agent():
         Returns:
             str: システムの応答文
         """
-        return s
+        # 入力文を分かち書きにする
+        tagger = MeCab.Tagger(f'-Owakati -d {os.getenv("MECAB_CONFIG_DICDIR")}')
+        rep = tagger.parse(s)
+
+        # TODO: Word2Vecで分散表現を得る
+        
+        return rep
