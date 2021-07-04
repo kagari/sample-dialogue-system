@@ -1,2 +1,3 @@
 ﻿mecab-python3==1.0.4
 unidic==1.0.3
+gensim==3.8.3
