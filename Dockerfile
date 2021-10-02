@@ -1,6 +1,6 @@
 ﻿RUN apt-get update && apt-get install -y mecab libmecab-dev sudo
 
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
 
 RUN cd /usr/local/etc/ && \
     git clone --depth 1 https://github.com/neologd/mecab-unidic-neologd.git && \

@@ -1,14 +1,14 @@
 import sys
-print(sys.path.append('/app/'))
-from model.agent import Agent
+sys.path.append('/app/')
+from model.agent import GPT2Agent
 
-SYSTEM_PROMPT = ''
+SYSTEM_PROMPT = '] '
 USER_PROMPT = '> '
 
 def main():
-    agent = Agent()  # 対話エージェントの初期化
+    print("Loading Dialogue Agent...")
+    agent = GPT2Agent("data/gpt-2")  # 対話エージェントの初期化
 
-    print('Starting Dialogue Agent...')
     print(SYSTEM_PROMPT+'Each time are finished talking, type RET twice.')
     while True:
         s = '\n'.join(iter(lambda: input(USER_PROMPT), ''))
@@ -16,7 +16,6 @@ def main():
         fw = s.split()[-1].replace('。', '').replace('、', '').replace('.', '').replace(',', '')
         if fw in {'またね', 'じゃあね', '終わり', 'おわり', 'finish', 'end', 'exit', 'see you'}:
             break
-        # TODO: 今は入力をそのまま返すだけなので、要修正
         r = agent.reply(s)
         print(SYSTEM_PROMPT+r, end='\n\n')
     print(SYSTEM_PROMPT+fw)
