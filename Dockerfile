@@ -1,10 +1,21 @@
-﻿RUN apt-get update && apt-get install -y mecab libmecab-dev sudo
+﻿From pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime
 
-RUN pip install -r requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
+RUN apt-get update && \
+    apt-get install -y python-opengl xvfb git
 
-RUN cd /usr/local/etc/ && \
-    git clone --depth 1 https://github.com/neologd/mecab-unidic-neologd.git && \
-    cd mecab-unidic-neologd && \
-    echo yes | ./bin/install-mecab-unidic-neologd -n && \
-    echo 'export MECAB_CONFIG_DICDIR=$(mecab-config --dicdir)/mecab-unidic-neologd' >> ~/.bashrc
-# RUN python -m unidic download  # 上記で最新の辞書をダウンロードしているので、古い辞書はダウンロードしない
+RUN conda config --add channels conda-forge && \
+    conda config --remove channels defaults && \
+    conda install 'mamba>=0.22.1'
+
+RUN mamba install -y \
+        jupyterlab \
+        matplotlib \
+        ipywidgets \
+        scikit-learn \
+        transformers \
+        sentencepiece \
+        tensorboard \
+        stable-baselines3 \
+        'huggingface_hub==0.4.0'
+
+RUN pip install trl
