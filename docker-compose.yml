@@ -1,9 +1,11 @@
 version: '3'
 services:
   app:
-    image: python:3.9.4
+    image: dialog-system
     volumes:
       - .:/app
     working_dir: /app
-    command: ["bash"]
+    ports:
+      - 8000:80
+    command: ["--debug"]
     tty: true
