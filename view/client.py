@@ -5,7 +5,7 @@ from model.agent import GPT2Agent
 SYSTEM_PROMPT = '] '
 USER_PROMPT = '> '
 
-def main():
+def main() -> None:
     print("Loading Dialogue Agent...")
     agent = GPT2Agent("data/gpt-2")  # 対話エージェントの初期化
 
@@ -13,9 +13,7 @@ def main():
     while True:
         s = '\n'.join(iter(lambda: input(USER_PROMPT), ''))
         # TODO: 空白文字 or 改行だけ、などの場合は以降の処理を行わないようにした方が良さそう
-        fw = s.split()[-1].replace('。', '').replace('、', '').replace('.', '').replace(',', '')
-        if fw in {'またね', 'じゃあね', '終わり', 'おわり', 'finish', 'end', 'exit', 'see you'}:
-            break
+        print(s)
         r = agent.reply(s)
         print(SYSTEM_PROMPT+r, end='\n\n')
     print(SYSTEM_PROMPT+fw)
