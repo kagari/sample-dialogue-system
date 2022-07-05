@@ -4,3 +4,4 @@ Makefile
 __pycache__
 huggingface_cache/*
 !huggingface_cache/.gitkeep
+singularity/image*
