@@ -12,6 +12,7 @@ from fastapi import (
 from fastapi.encoders import (
     jsonable_encoder,
 )
+from pydantic import BaseModel
 from model.agent import GPT2Agent
 
 
@@ -51,7 +52,7 @@ class DialogManager():
 s = time.time()
 agent = GPT2Agent(
     model_name="rinna/japanese-gpt2-medium",
-    model_checkpoint="data/gpt-2/GPT2-pretrain-step-80000.pkl",
+    model_checkpoint="data/gpt-2/GPT2-pretrain-step-28000.pkl",
 )
 # from model.agent import EchoAgent
 # agent = EchoAgent()
@@ -59,17 +60,33 @@ logger.debug(f"Load GPT2Agent: {time.time() - s:.2f} s")
 
 manager = DialogManager(
     agent,
-    max_utter_length=None,
+    max_utter_length=1,
 )
 
-@app.post("/handle_request")
-async def handle_request(request: Request):
+
+class Mattermost(BaseModel):
+    text: str
+    response_type: str
+
+@app.post("/mattermost", response_model=Mattermost)
+async def mattermost(request: Request):
     req = json.loads(
         (await request.body()).decode("utf-8")
     )
-    body = req['body']
-    response = manager(body)
-    return {"response": response}
+    # TODO: env で token との一致を確認する必要がある
+    # if req['token'] != env['token']:
+    #     return {"text": "bad access"}
+
+    text = req['text']
+    if text.startswith(req['trigger_word']):
+        text = text[len(req['trigger_word'])+1:]
+
+    logger.info(f"{text=}")
+    response = manager(text)
+    return {
+        "text": response,
+        "response_type": "in_channel", # "comment",
+    }
 
 
 if __name__ == "__main__":
