@@ -1,7 +1,12 @@
+env.ini
+
 .DS_Store
 .rsyncignore
 Makefile
 __pycache__
+
 huggingface_cache/*
 !huggingface_cache/.gitkeep
+
+# singularity image
 singularity/image*
