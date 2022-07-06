@@ -1,4 +1,4 @@
-from cgitb import handler
+import configparser
 import json
 import sys
 import time
@@ -8,6 +8,7 @@ import uvicorn
 from fastapi import (
     FastAPI,
     Request,
+    HTTPException,
 )
 from fastapi.encoders import (
     jsonable_encoder,
@@ -15,6 +16,9 @@ from fastapi.encoders import (
 from pydantic import BaseModel
 from model.agent import GPT2Agent
 
+
+config = configparser.ConfigParser()
+config.read('env.ini')
 
 logger = logging.getLogger('uvicorn')
 logger.setLevel(logging.DEBUG)
@@ -73,9 +77,8 @@ async def mattermost(request: Request):
     req = json.loads(
         (await request.body()).decode("utf-8")
     )
-    # TODO: env で token との一致を確認する必要がある
-    # if req['token'] != env['token']:
-    #     return {"text": "bad access"}
+    if req['token'] != config['Mattermost']['Token']:
+        raise HTTPException(status_code=400, detail="Bad Request")
 
     text = req['text']
     if text.startswith(req['trigger_word']):
@@ -85,7 +88,7 @@ async def mattermost(request: Request):
     response = manager(text)
     return {
         "text": response,
-        "response_type": "in_channel", # "comment",
+        "response_type": "in_channel",
     }
 
 
