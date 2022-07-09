@@ -55,8 +55,8 @@ class DialogManager():
 
 s = time.time()
 agent = GPT2Agent(
-    model_name="rinna/japanese-gpt2-medium",
-    model_checkpoint="data/gpt-2/GPT2-pretrain-step-28000.pkl",
+    model_name=config['GPT2Agent']['ModelName'],
+    model_checkpoint=config['GPT2Agent']['ModelCheckpoint'],
 )
 # from model.agent import EchoAgent
 # agent = EchoAgent()
