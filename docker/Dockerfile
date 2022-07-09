@@ -21,6 +21,6 @@ RUN mamba install -y \
 RUN mamba install -y \
         scikit-learn
 
-ENTRYPOINT ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "80"]
+ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
 
 RUN pip install line-bot-sdk
