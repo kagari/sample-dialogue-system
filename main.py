@@ -9,6 +9,7 @@ import uvicorn
 from fastapi import (
     FastAPI,
     Request,
+    BackgroundTasks,
     HTTPException,
 )
 from fastapi.encoders import (
@@ -133,8 +134,27 @@ def create_body(text):
         return text
 
 
+async def handle_events(events):
+    # if event is MessageEvent and message is TextMessage, then echo text
+    for event in events:
+        if not isinstance(event, MessageEvent):
+            continue
+        if not isinstance(event.message, TextMessage):
+            continue
+
+        response = manager(event.message.text)
+
+        try:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=response)
+            )
+        except:
+            line_logger.error("Couldn't reply message: reply_token = %s", event.reply_token)
+
+
 @app.post("/line")
-async def line(request: Request):
+async def line(request: Request, background_tasks: BackgroundTasks):
     stime = datetime.now().isoformat(' ', timespec='seconds')
 
     signature = request.headers.get('X-Line-Signature') or \
@@ -157,18 +177,8 @@ async def line(request: Request):
         )
         raise HTTPException(status_code=400, detail="Bad Request")
 
-    # if event is MessageEvent and message is TextMessage, then echo text
-    for event in events:
-        if not isinstance(event, MessageEvent):
-            continue
-        if not isinstance(event.message, TextMessage):
-            continue
+    background_tasks.add_task(handle_events, events=events)
 
-        response = manager(event.message.text)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=response)
-        )
     line_logger.info('Webhook\t%s\t%s\t%s\t%s\t%d\t%s',
         stime, 'POST', '/line', signature, 200, "ok"
     )
