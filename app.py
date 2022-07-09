@@ -78,13 +78,14 @@ async def mattermost(request: Request):
         (await request.body()).decode("utf-8")
     )
     if req['token'] != config['Mattermost']['Token']:
+        logger.error("status 400")
         raise HTTPException(status_code=400, detail="Bad Request")
 
     text = req['text']
     if text.startswith(req['trigger_word']):
         text = text[len(req['trigger_word'])+1:]
 
-    logger.info(f"{text=}")
+    logger.debug("request = %s", text)
     response = manager(text)
     return {
         "text": response,
