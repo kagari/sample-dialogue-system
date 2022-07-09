@@ -93,5 +93,69 @@ async def mattermost(request: Request):
     }
 
 
+from builtins import bytes
+from linebot import (
+    LineBotApi, WebhookParser
+)
+from linebot.exceptions import (
+    InvalidSignatureError
+)
+from linebot.models import (
+    MessageEvent, TextMessage, TextSendMessage
+)
+from linebot.utils import PY3
+
+
+channel_secret = config['LINE']['ChannelSecret']
+channel_access_token = config['LINE']['AccessToken']
+if channel_secret is None:
+    print('Specify LINE ChannelSecret as environment variable.')
+    sys.exit(1)
+if channel_access_token is None:
+    print('Specify LINE ChannelAccessToken as environment variable.')
+    sys.exit(1)
+
+line_bot_api = LineBotApi(channel_access_token)
+parser = WebhookParser(channel_secret)
+
+
+def create_body(text):
+    if PY3:
+        return [bytes(text, 'utf-8')]
+    else:
+        return text
+
+
+@app.post("/line")
+async def line(request: Request):
+    signature = request.headers.get('X-Line-Signature') or \
+        request.headers.get('x-line-signature')
+    if signature is None:
+        raise HTTPException(status_code=400, detail="Bad Request")
+
+    body = (await request.body()).decode("utf-8")
+
+    # parse webhook body
+    try:
+        events = parser.parse(body, signature)
+    except InvalidSignatureError:
+        raise HTTPException(status_code=400, detail="Bad Request")
+
+    # if event is MessageEvent and message is TextMessage, then echo text
+    for event in events:
+        if not isinstance(event, MessageEvent):
+            continue
+        if not isinstance(event.message, TextMessage):
+            continue
+
+        logger.debug("request = %s", event.message.text)
+        response = manager(event.message.text)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=response)
+        )
+    return "ok"
+
+
 if __name__ == "__main__":
     pass
