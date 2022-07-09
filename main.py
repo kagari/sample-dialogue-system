@@ -3,6 +3,7 @@ import json
 import sys
 import time
 import logging
+from datetime import datetime
 
 import uvicorn
 from fastapi import (
@@ -22,6 +23,12 @@ config.read('env.ini')
 
 logger = logging.getLogger('uvicorn')
 logger.setLevel(logging.DEBUG)
+
+line_logger = logging.getLogger('line')
+fileHandler = logging.FileHandler(config['LINE']['LogFile'], mode='a')
+line_logger.setLevel(logging.INFO)
+line_logger.addHandler(fileHandler)
+
 
 app = FastAPI()
 
@@ -128,17 +135,26 @@ def create_body(text):
 
 @app.post("/line")
 async def line(request: Request):
+    stime = datetime.now().isoformat(' ', timespec='seconds')
+
     signature = request.headers.get('X-Line-Signature') or \
         request.headers.get('x-line-signature')
+    body = (await request.body()).decode("utf-8")
+
     if signature is None:
+        line_logger.info('Webhook\t%s\t%s\t%s\t%s\t%d\t%s',
+            stime, 'POST', '/line', signature, 400, body
+        )
         raise HTTPException(status_code=400, detail="Bad Request")
 
-    body = (await request.body()).decode("utf-8")
 
     # parse webhook body
     try:
         events = parser.parse(body, signature)
     except InvalidSignatureError:
+        line_logger.info('Webhook\t%s\t%s\t%s\t%s\t%d\t%s',
+            stime, 'POST', '/line', signature, 400, body
+        )
         raise HTTPException(status_code=400, detail="Bad Request")
 
     # if event is MessageEvent and message is TextMessage, then echo text
@@ -148,12 +164,14 @@ async def line(request: Request):
         if not isinstance(event.message, TextMessage):
             continue
 
-        logger.debug("request = %s", event.message.text)
         response = manager(event.message.text)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=response)
         )
+    line_logger.info('Webhook\t%s\t%s\t%s\t%s\t%d\t%s',
+        stime, 'POST', '/line', signature, 200, "ok"
+    )
     return "ok"
 
 
