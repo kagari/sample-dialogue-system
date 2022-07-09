@@ -2,10 +2,18 @@
 
 ## How to Use
 
+### Docker
+
 ```console
-$ docker-compose up -d app
-$ docker-compose exec app bash
-$ python view/client.py
+$ docker compose build
+$ docker compose up -d app
+```
+
+### Singularity
+
+```console
+$ singularity build -f singularity/image.sif singularity/env.def
+$ singularity instance start singularity/image.sif kagari
 ```
 
 ## 構成
