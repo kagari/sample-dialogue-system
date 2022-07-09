@@ -11,5 +11,9 @@ huggingface_cache/*
 logs/*
 !logs/.gitkeep
 
+data/*
+!data/.gitkeep
+
+
 # singularity image
 singularity/image*
