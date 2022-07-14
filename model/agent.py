@@ -88,7 +88,7 @@ class GPT2Agent(BaseAgent):
         if checkpoint is not None:
             if not os.path.exists(checkpoint):
                 raise ValueError('checkpoint %s not exist' % checkpoint)
-            model_state_dict = torch.load(checkpoint)
+            model_state_dict = torch.load(checkpoint, map_location=torch.device('cpu'))
 
             model_state_dict = self.__fix_state_dict_namespace(model_state_dict)
 

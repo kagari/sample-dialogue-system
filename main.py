@@ -56,7 +56,7 @@ class DialogManager():
             inputs = self.dialog[-self.max_utter_length:]
         else:
             inputs = self.dialog
-        reply = self.agent.reply(inputs)
+        reply = self.agent.reply(inputs, top_p=0.99, top_k=10)
         self.dialog.append(reply)
         return reply
 
