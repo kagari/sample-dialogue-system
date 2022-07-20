@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 
-import mattermost
-import line
+from routers import mattermost, line
 
 
 app = FastAPI()
