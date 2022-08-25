@@ -11,7 +11,7 @@ from fastapi.encoders import (
 )
 
 from model.agent import GPT2Agent
-from controller import DialogManager
+from controller import UserManager
 
 
 router = APIRouter()
@@ -27,7 +27,7 @@ agent = GPT2Agent(
     model_name=config['GPT2Agent']['ModelName'],
     model_checkpoint=config['GPT2Agent']['ModelCheckpoint'],
 )
-manager = DialogManager(
+manager = UserManager(
     agent,
     max_utter_length=20,
 )
@@ -45,9 +45,10 @@ async def mattermost(request: Request):
     text = req['text']
     if text.startswith(req['trigger_word']):
         text = text[len(req['trigger_word'])+1:]
+    user_id = req['user_id']
 
     logger.debug("request = %s", text)
-    response = manager(text)
+    response = manager(user_id, text)
     return {
         "text": response,
         "response_type": "in_channel",

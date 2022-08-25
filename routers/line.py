@@ -21,7 +21,7 @@ from linebot.models import (
 from linebot.utils import PY3
 
 from model.agent import EchoAgent
-from controller import DialogManager
+from controller import UserManager
 
 
 router = APIRouter()
@@ -46,7 +46,7 @@ if channel_access_token is None:
 line_bot_api = LineBotApi(channel_access_token)
 parser = WebhookParser(channel_secret)
 
-manager = DialogManager(
+manager = UserManager(
     EchoAgent(),
     max_utter_length=20,
 )

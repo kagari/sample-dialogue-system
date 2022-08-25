@@ -13,19 +13,24 @@ from transformers import (
 )
 
 class BaseAgent():
-    def __init__(self) -> None:
-        pass
+    def __init__(self, name) -> None:
+        self.name = name
 
     def reply(self, s: List[str]) -> str:
         return '</s>'.join(s)
 
 
 class EchoAgent(BaseAgent):
-    pass
+    def __init__(self) -> None:
+        super().__init__("Echo")
+
+    def reply(self, s: List[str]) -> str:
+        return '</s>'.join(s)
 
 
 class DialoGPTAgent(BaseAgent):
     def __init__(self, model_path: str):
+        super().__init__("DialoGPT")
         self.tokenizer = T5Tokenizer.from_pretrained(model_path)
         self.tokenizer.do_lower_case = True  # due to some bug of tokenizer config loading
         self.model = AutoModelForCausalLM.from_pretrained(model_path)
@@ -49,6 +54,7 @@ class DialoGPTAgent(BaseAgent):
 
 class GPT2Agent(BaseAgent):
     def __init__(self, model_name: List[str], model_checkpoint: Optional[str] = None, tokenizer_checkpoint: Optional[str] = None):
+        super().__init__("GPT2")
         if tokenizer_checkpoint is not None:
             self.tokenizer = T5Tokenizer.from_pretrained(tokenizer_checkpoint)
         else:
