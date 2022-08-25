@@ -17,3 +17,6 @@ data/*
 
 # singularity image
 singularity/image*
+
+# vscode
+.vscode
