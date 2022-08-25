@@ -6,25 +6,23 @@ from time import time
 from model.agent import BaseAgent
 
 
-DIALOG_SAVE_DIR = "data/dialog"
-
-
 class UserManager():
-    def __init__(self, agent: BaseAgent, max_utter_length: int = 1):
+    def __init__(self, agent: BaseAgent, save_dir: str, max_utter_length: int = 1):
         """
         """
         self.user_instances: dict[str, DialogManager] = dict()
         self.agent: BaseAgent = agent
         self.max_utter_length: int = max_utter_length
-        self.latest_id = 0
-        if not os.path.isdir(DIALOG_SAVE_DIR):
-            os.makedirs(DIALOG_SAVE_DIR)
+        self.save_dir: str = save_dir
+        self.latest_id: int = 0
+        if not os.path.isdir(self.save_dir):
+            os.makedirs(self.save_dir)
         else:
-            fnames = sorted(glob(os.path.join(DIALOG_SAVE_DIR, "*.csv")))
+            fnames = sorted(glob(os.path.join(self.save_dir, "*.csv")))
             if fnames:
                 last_fname = fnames.pop()
                 bname = os.path.basename(last_fname)
-                title, _ = os.path.splitext(last_fname)
+                title, _ = os.path.splitext(bname)
                 self.latest_id = int(title.split("-").pop())
 
     def __call__(self, user_id: str, input_: str) -> str:
@@ -32,7 +30,7 @@ class UserManager():
             instance = self.user_instances[user_id]
         else:
             self.latest_id += 1
-            instance = DialogManager(self.latest_id, self.agent, self.max_utter_length)
+            instance = DialogManager(self.latest_id, self.agent, self.save_dir, self.max_utter_length)
             self.user_instances[user_id] = instance
 
         reply = instance(input_)
@@ -40,7 +38,7 @@ class UserManager():
 
 
 class DialogManager():
-    def __init__(self, id_: int, agent: BaseAgent, max_utter_length: int = 1):
+    def __init__(self, id_: int, agent: BaseAgent, save_dir: str, max_utter_length: int = 1):
         """
         max_utter_length (int): max number of utterance.
             1 is only use user input.
@@ -52,6 +50,7 @@ class DialogManager():
         self.dialog: list[str] = []
         self.agent: BaseAgent = agent
         self.max_utter_length: int = max_utter_length
+        self.save_dir: str = save_dir
 
     def __call__(self, input_: str) -> str:
         self.dialog.append(input_)
@@ -61,7 +60,7 @@ class DialogManager():
         reptime = time()
         self.dialog.append(reply)
 
-        fname = os.path.join(DIALOG_SAVE_DIR, f"{self.agent.name}-{self.id}.csv")
+        fname = os.path.join(self.save_dir, f"{self.agent.name}-{self.id}.csv")
         columns = ["timestamp", "from", "text"]
         if not os.path.isfile(fname):
             f = open(fname, "w", newline="")

@@ -1,6 +1,7 @@
 import configparser
 import json
 import logging
+import os
 from fastapi import (
     APIRouter,
     Request,
@@ -29,6 +30,7 @@ agent = GPT2Agent(
 )
 manager = UserManager(
     agent,
+    config['Mattermost']['DialogSaveDirectory'],
     max_utter_length=20,
 )
 

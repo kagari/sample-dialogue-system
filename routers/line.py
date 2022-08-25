@@ -2,6 +2,7 @@ import configparser
 import logging
 from datetime import datetime
 from builtins import bytes
+import sys
 
 from fastapi import (
     APIRouter,
@@ -48,6 +49,7 @@ parser = WebhookParser(channel_secret)
 
 manager = UserManager(
     EchoAgent(),
+    config['Mattermost']['DialogSaveDirectory'],
     max_utter_length=20,
 )
 

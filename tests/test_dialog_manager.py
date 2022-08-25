@@ -3,17 +3,20 @@ import shutil
 import unittest
 
 from model.agent import EchoAgent
-from controller import UserManager, DIALOG_SAVE_DIR
+from controller import UserManager
 
 
 class TestUserManager(unittest.TestCase):
+    def setUp(self) -> None:
+        self.test_save_dir = os.path.join("tests", "dialog")
+        return
+
     def tearDown(self) -> None:
-        self.tmp_dir = os.path.join(".", DIALOG_SAVE_DIR)
-        shutil.rmtree(self.tmp_dir, ignore_errors=True)
+        shutil.rmtree(self.test_save_dir, ignore_errors=True)
         return
 
     def test_user_counting(self) -> None:
-        user_manager = UserManager(EchoAgent(), 20)
+        user_manager = UserManager(EchoAgent(), self.test_save_dir, 20)
         for id_, user_id in enumerate(['a', 'b', 'c', 'd', 'e'], start=1):
             _ = user_manager(user_id, 'hello!')
             instance = user_manager.user_instances[user_id]
