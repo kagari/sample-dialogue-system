@@ -2,7 +2,6 @@ import csv
 import os
 from glob import glob
 from time import time
-from typing import Optional
 
 from model.agent import BaseAgent
 
