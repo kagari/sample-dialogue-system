@@ -1,4 +1,5 @@
 import os
+from abc import ABC
 from typing import (
     Optional,
     List,
@@ -12,12 +13,12 @@ from transformers import (
     AutoModelForCausalLM,
 )
 
-class BaseAgent():
+class BaseAgent(ABC):
     def __init__(self, name) -> None:
         self.name = name
 
     def reply(self, s: List[str]) -> str:
-        return '</s>'.join(s)
+        pass
 
 
 class EchoAgent(BaseAgent):
@@ -35,7 +36,7 @@ class DialoGPTAgent(BaseAgent):
         self.tokenizer.do_lower_case = True  # due to some bug of tokenizer config loading
         self.model = AutoModelForCausalLM.from_pretrained(model_path)
 
-    def reply(self, s: str) -> str:
+    def reply(self, s: List[str]) -> str:
         if not s.startswith(self.tokenizer.bos_token):
             s = self.tokenizer.bos_token + s
         if not s.endswith(self.tokenizer.sep_token):
@@ -65,8 +66,11 @@ class GPT2Agent(BaseAgent):
             model_checkpoint,
         )
 
-    def reply(self, ls: List[str], max_length: int = 128, top_p: float = 0.95, top_k: int = 50) -> str:
-        s = self.tokenizer.eos_token.join(ls)
+    def reply(self, s: List[str]) -> str:
+        max_length: int = 128
+        top_p = 0.99
+        top_k = 10
+        s = self.tokenizer.eos_token.join(s)
         if not s.startswith(self.tokenizer.bos_token):
             s = self.tokenizer.bos_token + s
         if not s.endswith(self.tokenizer.sep_token):

@@ -28,7 +28,6 @@ class UserManager():
                 self.latest_id = int(title.split("-").pop())
 
     def __call__(self, user_id: str, input_: str) -> str:
-        print(user_id)
         if user_id in self.user_instances:
             instance = self.user_instances[user_id]
         else:
@@ -55,12 +54,11 @@ class DialogManager():
         self.max_utter_length: int = max_utter_length
 
     def __call__(self, input_: str) -> str:
+        self.dialog.append(input_)
         intime = time()
         inputs = self.dialog[-self.max_utter_length:]
-        reply = self.agent.reply(inputs, top_p=0.99, top_k=10)
+        reply = self.agent.reply(inputs)
         reptime = time()
-
-        self.dialog.append(input_)
         self.dialog.append(reply)
 
         fname = os.path.join(DIALOG_SAVE_DIR, f"{self.agent.name}-{self.id}.csv")
