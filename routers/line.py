@@ -139,10 +139,10 @@ class UserManagerForEval:
                 "以下のURLからアンケートの回答をお願いします。\n" +
                 self.url)
             reply += "\n\n" + url_message
-            # if instance.agent.name == self.agent1.name:
-            #     instance.agent = self.agent2
-            # else:
-            #     instance.agent = self.agent1
+            if instance.agent.name == self.agent1.name:
+                instance.agent = self.agent2
+            else:
+                instance.agent = self.agent1
         return reply
 
 
