@@ -37,54 +37,51 @@ class TestLINEResponderForEvaluation(unittest.TestCase):
     def setUp(self) -> None:
         self.eval_turn = 10
         self.test_save_dir = os.path.join("tests", "dialog")
+        self.test_url = "https://example.com/questions"
+        self.user_id = "aaa"
+        self.agent1 = EchoAgent()
+        self.agent1.name = "agent1"
+        self.agent2 = EchoAgent()
+        self.agent2.name = "agent2"
         return
 
     def tearDown(self) -> None:
+        shutil.rmtree(self.test_save_dir, ignore_errors=True)
         return
 
     def test_reset_dialog(self) -> None:
-        user_id = "aaa"
-        agent1 = EchoAgent()
-        agent1.name = "agent1"
-        agent2 = EchoAgent()
-        agent2.name = "agent2"
         responder = LINEResponderForEvaluation(
-            agent1=agent1,
-            agent2=agent2,
+            agent1=self.agent1,
+            agent2=self.agent2,
             eval_turn=self.eval_turn,
             save_dir=self.test_save_dir,
             max_utter_length=1,
+            url=self.test_url,
         )
 
-        for len_, input_ in enumerate(map(str, range(self.eval_turn-1)), start=1):
-            _ = responder.reply(user_id=user_id, input_=input_)
-            self.assertEqual(len(responder.user_instances[user_id].dialog), len_*2)
-            self.assertEqual(responder.user_instances[user_id].dialog[-1], input_)
-        _ = responder.reply(user_id=user_id, input_=str(self.eval_turn))
-        self.assertEqual(len(responder.user_instances[user_id].dialog), 0)
+        for len_, input_ in enumerate(map(str, range(1, self.eval_turn)), start=1):
+            _ = responder.reply(user_id=self.user_id, input_=input_)
+            self.assertEqual(len(responder.user_instances[self.user_id].dialog), len_*2)
+            self.assertEqual(responder.user_instances[self.user_id].dialog[-1], input_)
+        _ = responder.reply(user_id=self.user_id, input_=str(self.eval_turn))
+        self.assertEqual(len(responder.user_instances[self.user_id].dialog), 0)
         return
 
     def test_post_form_url_and_dialog_id(self) -> None:
-        user_id = "aaa"
-        url = "https://example.com/questions"
-        agent1 = EchoAgent()
-        agent1.name = "agent1"
-        agent2 = EchoAgent()
-        agent2.name = "agent2"
         responder = LINEResponderForEvaluation(
-            agent1=agent1,
-            agent2=agent2,
+            agent1=self.agent1,
+            agent2=self.agent2,
             eval_turn=self.eval_turn,
             save_dir=self.test_save_dir,
             max_utter_length=1,
-            url=url,
+            url=self.test_url,
         )
 
         for input_ in map(str, range(1, self.eval_turn)):
-            _ = responder.reply(user_id=user_id, input_=input_)
-        response = responder.reply(user_id=user_id, input_=str(self.eval_turn))
-        dialog_id = f"{responder.user_instances[user_id].agent.name}-{responder.user_instances[user_id].id}"
-        url_message = (f"対話番号: {dialog_id}\n" + "以下のURLからアンケートの回答をお願いします。\n" + url)
+            _ = responder.reply(user_id=self.user_id, input_=input_)
+        response = responder.reply(user_id=self.user_id, input_=str(self.eval_turn))
+        dialog_id = f"{responder.user_instances[self.user_id].agent.name}-{responder.user_instances[self.user_id].id}"
+        url_message = (f"対話番号: {dialog_id}\n" + "以下のURLからアンケートの回答をお願いします。\n" + self.test_url)
         self.assertEqual(response, f"{self.eval_turn}\n\n{url_message}")
         return
 
