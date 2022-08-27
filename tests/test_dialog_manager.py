@@ -107,6 +107,23 @@ class TestLINEResponderForEvaluation(unittest.TestCase):
         self.assertEqual(responder.user_instances[self.user_id].agent.name, self.agent2.name)
         return
 
+    def test_user_counting(self) -> None:
+        responder = LINEResponderForEvaluation(
+            agent1=self.agent1,
+            agent2=self.agent2,
+            eval_turn=self.eval_turn,
+            save_dir=self.test_save_dir,
+            max_utter_length=1,
+            url=self.test_url,
+        )
+
+        for id_, user_id in enumerate(['a', 'b', 'c', 'd', 'e'], start=1):
+            _ = responder.reply(user_id, 'hello!')
+            instance = responder.user_instances[user_id]
+            self.assertEqual(instance.id, id_)
+            self.assertEqual(instance.dialog, ['hello!', 'hello!'])
+        return
+
 
 class TestResponseAPIforMattermost(unittest.TestCase):
     pass
