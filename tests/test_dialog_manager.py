@@ -4,6 +4,7 @@ import unittest
 
 from model.agent import EchoAgent
 from controller import UserManager
+from routers.line import LINEResponderForEvaluation
 
 
 class TestUserManager(unittest.TestCase):
@@ -35,24 +36,32 @@ class TestLINEResponderForEvaluation(unittest.TestCase):
     """
     def setUp(self) -> None:
         self.eval_turn = 10
+        self.test_save_dir = os.path.join("tests", "dialog")
         return
 
     def tearDown(self) -> None:
         return
 
     def test_reset_dialog(self) -> None:
+        user_id = "aaa"
+        agent1 = EchoAgent()
+        agent1.name = "agent1"
+        agent2 = EchoAgent()
+        agent2.name = "agent2"
         responder = LINEResponderForEvaluation(
-            agent=EchoAgent(),
+            agent1=agent1,
+            agent2=agent2,
             eval_turn=self.eval_turn,
-            max_utter_length=1
+            save_dir=self.test_save_dir,
+            max_utter_length=1,
         )
 
-        for len_, input_ in enumerate(map(str, range(self.eval_turn-1))):
-            responder.entrypoint(request, background_task)
-            self.assertEqual(len(responder.manager.user_instances[request['user_id']].dialog), len_)
-            self.assertEqual(len(responder.manager.user_instances[request['user_id']].dialog[-1]), input_)
-        _ = responder.reply(str(self.eval_turn))
-        self.assertEqual(len(responder.manager.user_instances[request['user_id']].dialog), 0)
+        for len_, input_ in enumerate(map(str, range(self.eval_turn-1)), start=1):
+            _ = responder.reply(user_id=user_id, input_=input_)
+            self.assertEqual(len(responder.user_instances[user_id].dialog), len_*2)
+            self.assertEqual(responder.user_instances[user_id].dialog[-1], input_)
+        _ = responder.reply(user_id=user_id, input_=str(self.eval_turn))
+        self.assertEqual(len(responder.user_instances[user_id].dialog), 0)
         return
 
     def test_post_form_url_and_dialog_id(self) -> None:
