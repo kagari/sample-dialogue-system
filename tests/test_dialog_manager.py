@@ -79,14 +79,32 @@ class TestLINEResponderForEvaluation(unittest.TestCase):
 
         for input_ in map(str, range(1, self.eval_turn)):
             _ = responder.reply(user_id=self.user_id, input_=input_)
+
+        # reply 後に agent が変わるため、reply 前に agent 名を取得しておく
+        agent_name = responder.user_instances[self.user_id].agent.name
+
         response = responder.reply(user_id=self.user_id, input_=str(self.eval_turn))
-        dialog_id = f"{responder.user_instances[self.user_id].agent.name}-{responder.user_instances[self.user_id].id}"
+
+        dialog_id = f"{agent_name}-{responder.user_instances[self.user_id].id}"
         url_message = (f"対話番号: {dialog_id}\n" + "以下のURLからアンケートの回答をお願いします。\n" + self.test_url)
         self.assertEqual(response, f"{self.eval_turn}\n\n{url_message}")
         return
 
     def test_switch_dialog_model(self) -> None:
-        pass
+        responder = LINEResponderForEvaluation(
+            agent1=self.agent1,
+            agent2=self.agent2,
+            eval_turn=self.eval_turn,
+            save_dir=self.test_save_dir,
+            max_utter_length=1,
+            url=self.test_url,
+        )
+
+        for input_ in map(str, range(1, self.eval_turn)):
+            _ = responder.reply(user_id=self.user_id, input_=input_)
+            self.assertEqual(responder.user_instances[self.user_id].agent.name, self.agent1.name)
+        _ = responder.reply(user_id=self.user_id, input_=str(self.eval_turn))
+        self.assertEqual(responder.user_instances[self.user_id].agent.name, self.agent2.name)
         return
 
 
