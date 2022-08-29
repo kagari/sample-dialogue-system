@@ -75,3 +75,37 @@ class DialogManager():
         f.close()
 
         return reply
+
+
+class UserManagerForEval:
+    def __init__(self, agent1: BaseAgent, agent2: BaseAgent, eval_turn: int, max_utter_length: int, save_dir: str, url: str) -> None:
+        self.agent1 = agent1
+        self.agent2 = agent2
+        self.eval_turn = eval_turn
+        self.max_utter_length = max_utter_length
+        self.save_dir = save_dir
+        self.url = url
+        self.user_instances: dict[str, DialogManager] = dict()
+        self.latest_id = 0
+        if not os.path.isdir(self.save_dir):
+            os.makedirs(self.save_dir)
+        return
+
+    def reply(self, user_id: str, input_: str) -> str:
+        if user_id not in self.user_instances:
+            self.latest_id += 1
+            self.user_instances[user_id] = DialogManager(self.latest_id, self.agent1, self.save_dir, self.max_utter_length)
+        instance = self.user_instances[user_id]
+        reply = instance(input_)
+        if len(instance.dialog)//2 ==  self.eval_turn:
+            instance.dialog = []
+            dialog_id = f"{instance.agent.name}-{instance.id}"
+            url_message = (f"対話番号: {dialog_id}\n" +
+                "以下のURLからアンケートの回答をお願いします。\n" +
+                self.url)
+            reply += "\n\n" + url_message
+            if instance.agent.name == self.agent1.name:
+                instance.agent = self.agent2
+            else:
+                instance.agent = self.agent1
+        return reply
