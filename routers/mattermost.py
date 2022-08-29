@@ -7,9 +7,6 @@ from fastapi import (
     Request,
     HTTPException,
 )
-from fastapi.encoders import (
-    jsonable_encoder,
-)
 
 from model.agent import GPT2Agent
 from controller import UserManager
