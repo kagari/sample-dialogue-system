@@ -146,5 +146,3 @@ class UserManagerForEval:
         return reply
 
 
-class LINEResponderForEvaluation(UserManagerForEval):
-    pass

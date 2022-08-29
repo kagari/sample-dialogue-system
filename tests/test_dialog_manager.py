@@ -4,7 +4,7 @@ import unittest
 
 from model.agent import EchoAgent
 from controller import UserManager
-from routers.line import LINEResponderForEvaluation
+from routers.line import UserManagerForEval
 
 
 class TestUserManager(unittest.TestCase):
@@ -50,7 +50,7 @@ class TestLINEResponderForEvaluation(unittest.TestCase):
         return
 
     def test_reset_dialog(self) -> None:
-        responder = LINEResponderForEvaluation(
+        responder = UserManagerForEval(
             agent1=self.agent1,
             agent2=self.agent2,
             eval_turn=self.eval_turn,
@@ -68,7 +68,7 @@ class TestLINEResponderForEvaluation(unittest.TestCase):
         return
 
     def test_post_form_url_and_dialog_id(self) -> None:
-        responder = LINEResponderForEvaluation(
+        responder = UserManagerForEval(
             agent1=self.agent1,
             agent2=self.agent2,
             eval_turn=self.eval_turn,
@@ -91,7 +91,7 @@ class TestLINEResponderForEvaluation(unittest.TestCase):
         return
 
     def test_switch_dialog_model(self) -> None:
-        responder = LINEResponderForEvaluation(
+        responder = UserManagerForEval(
             agent1=self.agent1,
             agent2=self.agent2,
             eval_turn=self.eval_turn,
@@ -108,7 +108,7 @@ class TestLINEResponderForEvaluation(unittest.TestCase):
         return
 
     def test_user_counting(self) -> None:
-        responder = LINEResponderForEvaluation(
+        responder = UserManagerForEval(
             agent1=self.agent1,
             agent2=self.agent2,
             eval_turn=self.eval_turn,
