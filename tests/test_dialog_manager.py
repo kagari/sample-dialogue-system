@@ -86,7 +86,11 @@ class TestLINEResponderForEvaluation(unittest.TestCase):
         response = responder.reply(user_id=self.user_id, input_=str(self.eval_turn))
 
         dialog_id = f"{agent_name}-{responder.user_instances[self.user_id].id}"
-        url_message = (f"対話番号: {dialog_id}\n" + "以下のURLからアンケートの回答をお願いします。\n" + self.test_url)
+        url_message = (
+            "これでこの対話は終了です。\n" +
+            f"対話番号: {dialog_id}\n" +
+            "以下のURLからアンケートの回答をお願いします。\n" +
+            self.test_url)
         self.assertEqual(response, f"{self.eval_turn}\n\n{url_message}")
         return
 

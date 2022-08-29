@@ -100,7 +100,9 @@ class UserManagerForEval:
         if len(instance.dialog)//2 ==  self.eval_turn:
             instance.dialog = []
             dialog_id = f"{instance.agent.name}-{instance.id}"
-            url_message = (f"対話番号: {dialog_id}\n" +
+            url_message = (
+                "これでこの対話は終了です。\n" +
+                f"対話番号: {dialog_id}\n" +
                 "以下のURLからアンケートの回答をお願いします。\n" +
                 self.url)
             reply += "\n\n" + url_message
