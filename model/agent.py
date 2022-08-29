@@ -52,7 +52,7 @@ class DialoGPTAgent(BaseAgent):
         return rep
 
 class GPT2Agent(BaseAgent):
-    def __init__(self, model_name: List[str], model_checkpoint: Optional[str] = None, tokenizer_checkpoint: Optional[str] = None):
+    def __init__(self, model_name: str, model_checkpoint: Optional[str] = None, tokenizer_checkpoint: Optional[str] = None):
         super().__init__("GPT2")
         if tokenizer_checkpoint is not None:
             self.tokenizer = T5Tokenizer.from_pretrained(tokenizer_checkpoint)
