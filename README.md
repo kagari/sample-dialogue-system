@@ -28,3 +28,14 @@ viewディレクトリにはclient.pyがあり、これを実行することで�
 └── view
     └── client.py
 ```
+
+## Testing
+
+``` console
+$ singularity exec singularity/image.sif python -m unittest tests/test_*.py
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.038s
+
+OK
+```
