@@ -22,8 +22,8 @@ config.read('env.ini')
 
 
 agent = GPT2Agent(
-    model_name=config['GPT2Agent']['ModelName'],
-    model_checkpoint=config['GPT2Agent']['ModelCheckpoint'],
+    model_name=config['FullDialoGPT']['ModelName'],
+    model_checkpoint=config['FullDialoGPT']['ModelCheckpoint'],
 )
 manager = UserManager(
     agent,

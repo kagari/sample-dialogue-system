@@ -33,7 +33,7 @@ config.read('env.ini')
 
 line_logger = logging.getLogger('line')
 fileHandler = logging.FileHandler(config['LINE']['LogFile'], mode='a')
-line_logger.setLevel(logging.INFO)
+line_logger.setLevel(logging.DEBUG)
 line_logger.addHandler(fileHandler)
 
 channel_secret = config['LINE']['ChannelSecret']
@@ -48,18 +48,24 @@ if channel_access_token is None:
 line_bot_api = LineBotApi(channel_access_token)
 parser = WebhookParser(channel_secret)
 
-manager = UserManagerForEval(
-    agent1=GPT2Agent(
+agent1 = GPT2Agent(
     model_name=config['GPT2Agent']['ModelName'],
     model_checkpoint=config['GPT2Agent']['ModelCheckpoint'],
-    ),
-    agent2=GPT2Agent(
-        model_name="rinna/japanese-gpt2-medium",
-        model_checkpoint="data/gendered/GPT2-finetune-step-600.pkl",
-    ),
+)
+agent1.name = "bmodel"
+
+agent2 = GPT2Agent(
+    model_name=config['FemaleGPT2Agent']['ModelName'],
+    model_checkpoint=config['FemaleGPT2Agent']['ModelCheckpoint'],
+)
+agent2.name = "fmodel"
+
+manager = UserManagerForEval(
+    agent1=agent1,
+    agent2=agent2,
     eval_turn=10,
-    max_utter_length=1,
-    save_dir=os.path.join("data", "line", "dialog"),
+    max_utter_length=2,
+    save_dir=config['LINE']['DialogSaveDirectory'],
     url=config['EvalDialogModel']['URL'],
 )
 
