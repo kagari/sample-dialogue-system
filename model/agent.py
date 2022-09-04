@@ -35,10 +35,8 @@ class DialoGPTAgent(BaseAgent):
         self.model = AutoModelForCausalLM.from_pretrained(model_path)
 
     def reply(self, s: List[str]) -> str:
-        if not s.startswith(self.tokenizer.bos_token):
-            s = self.tokenizer.bos_token + s
-        if not s.endswith(self.tokenizer.sep_token):
-            s += self.tokenizer.sep_token
+        if not s.endswith(self.tokenizer.eos_token):
+            s += self.tokenizer.eos_token
         input_ids = self.tokenizer(s, return_tensors="pt")["input_ids"]
         output_sequences = self.model.generate(
             input_ids=input_ids, top_p=0.95, top_k=50, do_sample=True,
@@ -48,8 +46,9 @@ class DialoGPTAgent(BaseAgent):
         )
         generated = output_sequences.tolist()[0]
         generated = self.tokenizer.decode(generated)
-        _, rep = generated.replace(' ', '').replace('<s>', '').replace('</s>', '').split('[SEP]')
+        *_, rep = generated.replace('</s> ', '</s>').split(tokenizer.eos_token)[:-1]
         return rep
+
 
 class GPT2Agent(BaseAgent):
     def __init__(self, model_name: str, model_checkpoint: Optional[str] = None, tokenizer_checkpoint: Optional[str] = None):
@@ -69,10 +68,8 @@ class GPT2Agent(BaseAgent):
         top_p = 0.99
         top_k = 10
         s = self.tokenizer.eos_token.join(s)
-        if not s.startswith(self.tokenizer.bos_token):
-            s = self.tokenizer.bos_token + s
-        if not s.endswith(self.tokenizer.sep_token):
-            s += self.tokenizer.sep_token
+        if not s.endswith(self.tokenizer.eos_token):
+            s += self.tokenizer.eos_token
         input_ids = self.tokenizer(s, return_tensors="pt")["input_ids"]
         output_sequences = self.model.generate(
             input_ids=input_ids,
@@ -87,7 +84,7 @@ class GPT2Agent(BaseAgent):
         )
         generated = output_sequences.tolist()[0]
         generated = self.tokenizer.decode(generated)
-        _, rep = generated.replace(' ', '').replace('<s>', '').replace('</s>', '').split('[SEP]')
+        *_, rep = generated.replace('</s> ', '</s>').split(tokenizer.eos_token)[:-1]
         return rep
     
     def __load_model(self, model: str, checkpoint: Optional[str] = None):
