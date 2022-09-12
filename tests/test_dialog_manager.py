@@ -111,6 +111,29 @@ class TestLINEResponderForEvaluation(unittest.TestCase):
         self.assertEqual(responder.user_instances[self.user_id].agent.name, self.agent2.name)
         return
 
+    def test_multiple_switch_dialog_model(self) -> None:
+        responder = UserManagerForEval(
+            agent1=self.agent1,
+            agent2=self.agent2,
+            eval_turn=self.eval_turn,
+            save_dir=self.test_save_dir,
+            max_utter_length=1,
+            url=self.test_url,
+        )
+
+        for input_ in map(str, range(1, self.eval_turn)):
+            _ = responder.reply(user_id=self.user_id, input_=input_)
+            self.assertEqual(responder.user_instances[self.user_id].agent.name, "agent1")
+        _ = responder.reply(user_id=self.user_id, input_=str(self.eval_turn))
+        self.assertEqual(responder.user_instances[self.user_id].agent.name, "agent2")
+
+        for input_ in map(str, range(1, self.eval_turn)):
+            _ = responder.reply(user_id=self.user_id, input_=input_)
+            self.assertEqual(responder.user_instances[self.user_id].agent.name, "agent2")
+        _ = responder.reply(user_id=self.user_id, input_=str(self.eval_turn))
+        self.assertEqual(responder.user_instances[self.user_id].agent.name, "agent1")
+        return
+
     def test_user_counting(self) -> None:
         responder = UserManagerForEval(
             agent1=self.agent1,
