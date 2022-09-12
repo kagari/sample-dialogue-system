@@ -84,7 +84,7 @@ class GPT2Agent(BaseAgent):
         )
         generated = output_sequences.tolist()[0]
         generated = self.tokenizer.decode(generated)
-        *_, rep = generated.replace('</s> ', '</s>').split(tokenizer.eos_token)[:-1]
+        *_, rep = generated.replace('</s> ', '</s>').split(self.tokenizer.eos_token)[:-1]
         return rep
     
     def __load_model(self, model: str, checkpoint: Optional[str] = None):
